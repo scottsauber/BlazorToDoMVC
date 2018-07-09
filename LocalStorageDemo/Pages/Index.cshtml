@@ -1,7 +1,70 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<section class="todoapp">
+    <header class="header">
+        <h1>todos</h1>
+        <input class="new-todo" placeholder="What needs to be done?" autofocus bind="@CurrentTitle" onkeyup=@((args) => AddToList(args, CurrentTitle)) />
+    </header>
+    <section class="main">
+        <input class="toggle-all" type="checkbox">
+        <label for="toggle-all">Mark all as complete</label>
+        <ul class="todo-list">
+            @foreach (var item in ToDoItems)
+            {
+                <li class=@(item.IsCompleted ? "completed" : null)>
+                    <div class="view">
+                        <input class="toggle" type="checkbox" checked="@item.IsCompleted" onclick=@(() => MarkAsCompleted(item.Id)) />
+                        <label>@item.Title</label>
+                        <button class="destroy" onclick=@(() => DeleteItemFromList(item.Id))></button>
+                    </div>
+                </li>
+            }
+        </ul>
+    </section>
+    <footer class="footer">
+        <span class="todo-count">@ToDoItems.Count(t => !t.IsCompleted) left</span>
+        @if (ToDoItems.Count(t => !t.IsCompleted) > 0)
+        {
+            <button class="clear-completed" onclick=@(ClearCompleted)>Clear completed</button>
+        }
+    </footer>
+</section>
 
-Welcome to your new app.
+@functions {
+    string CurrentTitle;
+    List<ToDoItem> ToDoItems = new List<ToDoItem>();
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    void AddToList(UIKeyboardEventArgs args, string currentTitle)
+    {
+        if (!args.Key.Equals("Enter", StringComparison.OrdinalIgnoreCase))
+            return;
+
+        int maxId = 0;
+        if (ToDoItems.Count > 0)
+            maxId = ToDoItems.Max(t => t.Id);
+
+        var toDoItem = new ToDoItem
+        {
+            Id = maxId + 1,
+            Title = currentTitle
+        };
+        ToDoItems.Add(toDoItem);
+        CurrentTitle = null;
+    }
+
+    void MarkAsCompleted(int id)
+    {
+        var todo = ToDoItems.Single(t => t.Id == id);
+        todo.IsCompleted = !todo.IsCompleted;
+    }
+
+    void DeleteItemFromList(int id)
+    {
+        ToDoItems = ToDoItems.Where(i => i.Id != id).ToList();
+    }
+
+    void ClearCompleted()
+    {
+        ToDoItems = ToDoItems.Where(i => !i.IsCompleted).ToList();
+    }
+}
