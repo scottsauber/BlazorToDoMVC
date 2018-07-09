@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Cloudcrate.AspNetCore.Blazor.Browser.Storage;
+@inject LocalStorage Storage
 
 <section class="todoapp">
     <header class="header">
@@ -33,6 +35,12 @@
 @functions {
     string CurrentTitle;
     List<ToDoItem> ToDoItems = new List<ToDoItem>();
+    string storageKey = "ToDoItems";
+
+    protected override void OnInit()
+    {
+        ToDoItems = Storage.GetItem<List<ToDoItem>>(storageKey);
+    }
 
     void AddToList(UIKeyboardEventArgs args, string currentTitle)
     {
@@ -50,21 +58,30 @@
         };
         ToDoItems.Add(toDoItem);
         CurrentTitle = null;
+        UpdateLocalStorage();
     }
 
     void MarkAsCompleted(int id)
     {
         var todo = ToDoItems.Single(t => t.Id == id);
         todo.IsCompleted = !todo.IsCompleted;
+        UpdateLocalStorage();
     }
 
     void DeleteItemFromList(int id)
     {
         ToDoItems = ToDoItems.Where(i => i.Id != id).ToList();
+        UpdateLocalStorage();
     }
 
     void ClearCompleted()
     {
         ToDoItems = ToDoItems.Where(i => !i.IsCompleted).ToList();
+        UpdateLocalStorage();
+    }
+
+    void UpdateLocalStorage()
+    {
+        Storage.SetItem(storageKey, ToDoItems);
     }
 }

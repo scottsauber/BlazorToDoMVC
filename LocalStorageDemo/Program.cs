@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Blazor.Browser.Rendering;
+﻿using Cloudcrate.AspNetCore.Blazor.Browser.Storage;
+using Microsoft.AspNetCore.Blazor.Browser.Rendering;
 using Microsoft.AspNetCore.Blazor.Browser.Services;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace LocalStorageDemo
 {
@@ -11,6 +10,7 @@ namespace LocalStorageDemo
         {
             var serviceProvider = new BrowserServiceProvider(services =>
             {
+                services.AddStorage();
                 // Add any custom services here
             });
 
