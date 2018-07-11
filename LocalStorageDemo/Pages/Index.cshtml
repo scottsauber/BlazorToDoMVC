@@ -39,7 +39,10 @@
 
     protected override void OnInit()
     {
-        ToDoItems = Storage.GetItem<List<ToDoItem>>(storageKey);
+        var existingItems = Storage.GetItem<List<ToDoItem>>(storageKey);
+
+        if (existingItems != null)
+            ToDoItems = existingItems;
     }
 
     void AddToList(UIKeyboardEventArgs args, string currentTitle)
