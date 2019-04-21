@@ -1,7 +1,6 @@
 ﻿@page "/"
 @using BlazorToDoMvc.JsInterop;
 @inject LocalStorage Storage
-@*@inject IJSRuntime JsRuntime*@
 
 <section class="todoapp">
     <header class="header">
@@ -41,8 +40,6 @@
 
     protected override async Task OnInitAsync()
     {
-        //await JsRuntime.InvokeAsync<Task>("console.log", "blah");
-        //var test = await JsRuntime.InvokeAsync<Task>("setLocalStorage", "test", "blah123");
         var existingItems = await Storage.GetItemAsync<List<ToDoItem>>(storageKey);
 
         if (existingItems != null)
