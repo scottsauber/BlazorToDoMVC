@@ -1,4 +1,4 @@
-﻿namespace LocalStorageDemo.Models
+﻿namespace BlazorToDoMvc.Models
 {
     public class ToDoItem
     {

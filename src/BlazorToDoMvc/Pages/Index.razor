@@ -1,6 +1,7 @@
 ﻿@page "/"
-@using Cloudcrate.AspNetCore.Blazor.Browser.Storage;
+@using BlazorToDoMvc.JsInterop;
 @inject LocalStorage Storage
+@*@inject IJSRuntime JsRuntime*@
 
 <section class="todoapp">
     <header class="header">
@@ -37,22 +38,31 @@
     List<ToDoItem> ToDoItems = new List<ToDoItem>();
     string storageKey = "ToDoItems";
 
-    protected override void OnInit()
+
+    protected override async Task OnInitAsync()
     {
-        var existingItems = Storage.GetItem<List<ToDoItem>>(storageKey);
+        //await JsRuntime.InvokeAsync<Task>("console.log", "blah");
+        //var test = await JsRuntime.InvokeAsync<Task>("setLocalStorage", "test", "blah123");
+        var existingItems = await Storage.GetItemAsync<List<ToDoItem>>(storageKey);
 
         if (existingItems != null)
+        {
             ToDoItems = existingItems;
+        }
     }
 
-    void AddToList(UIKeyboardEventArgs args, string currentTitle)
+    async Task AddToList(UIKeyboardEventArgs args, string currentTitle)
     {
         if (!args.Key.Equals("Enter", StringComparison.OrdinalIgnoreCase))
+        {
             return;
+        }
 
         int maxId = 0;
         if (ToDoItems.Count > 0)
+        {
             maxId = ToDoItems.Max(t => t.Id);
+        }
 
         var toDoItem = new ToDoItem
         {
@@ -61,30 +71,30 @@
         };
         ToDoItems.Add(toDoItem);
         CurrentTitle = null;
-        UpdateLocalStorage();
+        await UpdateLocalStorage();
     }
 
-    void MarkAsCompleted(int id)
+    async Task MarkAsCompleted(int id)
     {
         var todo = ToDoItems.Single(t => t.Id == id);
         todo.IsCompleted = !todo.IsCompleted;
-        UpdateLocalStorage();
+        await UpdateLocalStorage();
     }
 
-    void DeleteItemFromList(int id)
+    async Task DeleteItemFromList(int id)
     {
         ToDoItems = ToDoItems.Where(i => i.Id != id).ToList();
-        UpdateLocalStorage();
+        await UpdateLocalStorage();
     }
 
-    void ClearCompleted()
+    async Task ClearCompleted()
     {
         ToDoItems = ToDoItems.Where(i => !i.IsCompleted).ToList();
-        UpdateLocalStorage();
+        await UpdateLocalStorage();
     }
 
-    void UpdateLocalStorage()
+    async Task UpdateLocalStorage()
     {
-        Storage.SetItem(storageKey, ToDoItems);
+        await Storage.SetItemAsync(storageKey, ToDoItems);
     }
 }
